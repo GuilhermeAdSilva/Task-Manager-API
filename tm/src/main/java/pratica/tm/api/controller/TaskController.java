@@ -42,7 +42,7 @@ public class TaskController {
     }
 
     @PostMapping()
-    public ResponseEntity<Object> criarTarefa(@RequestBody TaskRequestDTO dto) {
+    public ResponseEntity<?> criarTarefa(@RequestBody TaskRequestDTO dto) {
         try {
             Task task = dto.mapearParaTask();
             service.salvar(task);
@@ -53,14 +53,15 @@ public class TaskController {
                     .buildAndExpand(task.getId())
                     .toUri();
 
-            return ResponseEntity.created(location).build();
+            TaskResponseDTO response = new TaskResponseDTO(task.getId(), task.getNome(), task.getDescricao(), task.getFinalizada(), task.getDataCriacao(), task.getUltimaAtualizacao());
+            return ResponseEntity.created(location).body(response);
         } catch (OperacaoNaoPermitidaException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<Object> editarTarefa(@RequestBody TaskRequestDTO dto, @PathVariable("id") UUID id) {
+    public ResponseEntity<?> editarTarefa(@RequestBody TaskRequestDTO dto, @PathVariable("id") UUID id) {
         Optional<Task> taskOptional = service.buscarTarefaPorID(id);
         if (taskOptional.isPresent()) {
             try {
@@ -75,7 +76,8 @@ public class TaskController {
                         .buildAndExpand(task.getId())
                         .toUri();
 
-                return ResponseEntity.created(location).build();
+                TaskResponseDTO response = new TaskResponseDTO(task.getId(), task.getNome(), task.getDescricao(), task.getFinalizada(), task.getDataCriacao(), task.getUltimaAtualizacao());
+                return ResponseEntity.created(location).body(response);
             } catch (OperacaoNaoPermitidaException e) {
                 return ResponseEntity.badRequest().body(e.getMessage());
             }

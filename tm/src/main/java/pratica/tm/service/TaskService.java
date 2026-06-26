@@ -16,7 +16,7 @@ public class TaskService {
     private final TaskRepository repository;
 
     public List<Task> buscarTarefas() {
-        return repository.findAll();
+        return repository.getTasksOrdenado();
     }
 
     public Optional<Task> buscarTarefaPorID(UUID id) {
@@ -24,7 +24,7 @@ public class TaskService {
     }
 
     public Task salvar(Task task) {
-        validar();
+        validar(task);
         return repository.save(task);
     }
 
@@ -32,7 +32,7 @@ public class TaskService {
         if(task.getId() == null) {
             throw new OperacaoNaoPermitidaException("Tarefa não encontrada na base");
         }
-        validar();
+        validar(task);
         return repository.save(task);
     }
 
@@ -40,7 +40,12 @@ public class TaskService {
         repository.deleteById(id);
     }
 
-    public void validar() {
-
+    public void validar(Task task) {
+        if (task.getNome().trim().isEmpty()) {
+            throw new OperacaoNaoPermitidaException("Nome da tarefa não pode ser vazio!");
+        }
+        if (task.getDescricao().trim().isEmpty()) {
+            throw new OperacaoNaoPermitidaException("Tarefa não pode ter descrição vazia!");
+        }
     }
 }
